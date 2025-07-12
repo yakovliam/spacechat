@@ -77,6 +77,9 @@ public class Messages {
     // format receive
     public Message messageFormatReceive;
 
+    // cooldown message
+    public Message messageCooldown;
+
     /*
        Reply
      */
@@ -147,6 +150,7 @@ public class Messages {
         messageSelf = Message.fromConfigurationSection("message.self-message", this.getLangConfiguration());
         messageFormatSend = Message.fromConfigurationSection("message.format.send", this.getLangConfiguration());
         messageFormatReceive = Message.fromConfigurationSection("message.format.receive", this.getLangConfiguration());
+        messageCooldown = Message.fromConfigurationSection("message.cooldown", this.getLangConfiguration());
 
         replyArgs = Message.fromConfigurationSection("reply.args", this.getLangConfiguration());
         replyNoTarget = Message.fromConfigurationSection("reply.no-target", this.getLangConfiguration());

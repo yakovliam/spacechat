@@ -8,8 +8,9 @@ import dev.spaceseries.spacechat.loader.FormatManager;
 import dev.spaceseries.spacechat.model.formatting.ChatFormat;
 import dev.spaceseries.spacechat.model.formatting.FormatType;
 import dev.spaceseries.spacechat.sync.ServerSyncServiceManager;
+import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.event.player.PlayerEvent;
 
 import java.util.Comparator;
 import java.util.Locale;
@@ -53,7 +54,7 @@ public class ChatFormatManager extends FormatManager<ChatFormat> {
      * @param event   The event
      * @param message The message
      */
-    public void send(AsyncPlayerChatEvent event, String message) {
+    public void send(PlayerEvent event, Component message) {
         ChatManager chatManager = plugin.getChatManager();
 
         // get player

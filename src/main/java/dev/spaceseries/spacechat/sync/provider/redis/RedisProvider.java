@@ -80,7 +80,7 @@ public class RedisProvider implements Provider<JedisPool> {
                     accept(jedis);
                 } catch (JedisDataException e) {
                     // Fix Java +16 error
-                    if (e.getMessage().contains("NOAUTH")) {
+                    if (e.getMessage().contains("NOAUTH") || e.getMessage().contains("unauthenticated")) {
                         jedis.auth(password);
                         accept(jedis);
                     } else {
@@ -117,7 +117,7 @@ public class RedisProvider implements Provider<JedisPool> {
                     return apply(jedis);
                 } catch (JedisDataException e) {
                     // Fix Java +16 error
-                    if (e.getMessage().contains("NOAUTH")) {
+                    if (e.getMessage().contains("NOAUTH") || e.getMessage().contains("unauthenticated")) {
                         jedis.auth(password);
                         return apply(jedis);
                     } else {

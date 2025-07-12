@@ -1,24 +1,21 @@
 package dev.spaceseries.spacechat.builder.extra;
 
 import dev.spaceseries.spacechat.api.config.generic.adapter.ConfigurationAdapter;
-import dev.spaceseries.spacechat.api.wrapper.Pair;
-import dev.spaceseries.spacechat.builder.Builder;
 import dev.spaceseries.spacechat.model.formatting.action.HoverAction;
 
 import java.util.Collections;
 import java.util.List;
 
-public class HoverActionBuilder implements Builder<Pair<String, ConfigurationAdapter>, HoverAction> {
+public class HoverActionBuilder {
 
     /**
      * Builds an V (output) from a K (input)
      *
-     * @param input The input
+     * @param path
+     * @param adapter
+     * @return
      */
-    @Override
-    public HoverAction build(Pair<String, ConfigurationAdapter> input) {
-        ConfigurationAdapter adapter = input.getRight();
-        String path = input.getLeft();
+    public HoverAction build(String path, ConfigurationAdapter adapter) {
 
         // create object
         HoverAction hoverAction = new HoverAction();

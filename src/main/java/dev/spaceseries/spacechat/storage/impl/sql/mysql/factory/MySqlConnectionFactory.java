@@ -10,7 +10,7 @@ import java.sql.SQLException;
 import java.util.Enumeration;
 import java.util.Map;
 
-@Dependency(value = "mysql:mysql-connector-java:8.0.30",
+@Dependency(value = "com.mysql:mysql-connector-j:9.2.0",
         relocate = {
                 "com.mysql", "{package}.lib.mysql",
                 "com.google.protobuf", "{package}.lib.protobuf"

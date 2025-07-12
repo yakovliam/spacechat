@@ -1,5 +1,7 @@
 package dev.spaceseries.spacechat.logging.wrap;
 
+import net.kyori.adventure.text.Component;
+
 import java.util.Date;
 import java.util.UUID;
 
@@ -18,7 +20,7 @@ public class LogChatWrapper extends LogWrapper {
     /**
      * Message
      */
-    private String message;
+    private Component message;
 
     /**
      * The date at which the chat message was sent
@@ -34,7 +36,7 @@ public class LogChatWrapper extends LogWrapper {
      * @param message    message
      * @param at         The time
      */
-    public LogChatWrapper(LogType logType, String senderName, UUID senderUUID, String message, Date at) {
+    public LogChatWrapper(LogType logType, String senderName, UUID senderUUID, Component message, Date at) {
         super(logType);
 
         this.senderName = senderName;
@@ -102,7 +104,7 @@ public class LogChatWrapper extends LogWrapper {
      *
      * @return message
      */
-    public String getMessage() {
+    public Component getMessage() {
         return message;
     }
 
@@ -111,7 +113,7 @@ public class LogChatWrapper extends LogWrapper {
      *
      * @param message message
      */
-    public void setMessage(String message) {
+    public void setMessage(Component message) {
         this.message = message;
     }
 }

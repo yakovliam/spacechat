@@ -43,7 +43,7 @@ import static dev.spaceseries.spacechat.config.SpaceChatConfigKeys.*;
 
 @Dependencies(
         value = {
-                @Dependency(value = "redis.clients:jedis:4.4.6", relocate = {"org.json", "{package}.lib.json"}),
+                @Dependency(value = "redis.clients:jedis:5.2.0", relocate = {"org.json", "{package}.lib.json"}),
                 @Dependency("org.slf4j:slf4j-nop:1.7.36")
         },
         relocations = {

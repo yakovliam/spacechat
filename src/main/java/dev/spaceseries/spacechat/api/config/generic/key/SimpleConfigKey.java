@@ -14,6 +14,9 @@ public class SimpleConfigKey<T> implements ConfigKey<T> {
 
     private int ordinal = -1;
     private boolean reloadable = true;
+    private boolean memoize = false;
+
+    private T cachedValue;
 
     SimpleConfigKey(Function<? super ConfigurationAdapter, ? extends T> function) {
         this.function = function;
@@ -21,6 +24,12 @@ public class SimpleConfigKey<T> implements ConfigKey<T> {
 
     @Override
     public T get(ConfigurationAdapter adapter) {
+        if (memoize) {
+            if (cachedValue == null) {
+                cachedValue = this.function.apply(adapter);
+            }
+            return cachedValue;
+        }
         return this.function.apply(adapter);
     }
 
@@ -34,11 +43,25 @@ public class SimpleConfigKey<T> implements ConfigKey<T> {
         return this.reloadable;
     }
 
+    @Override
+    public boolean memoize() {
+        return memoize;
+    }
+
+    @Override
+    public void clear() {
+        cachedValue = null;
+    }
+
     public void setOrdinal(int ordinal) {
         this.ordinal = ordinal;
     }
 
     public void setReloadable(boolean reloadable) {
         this.reloadable = reloadable;
+    }
+
+    public void setMemoize(boolean memoize) {
+        this.memoize = memoize;
     }
 }

@@ -5,12 +5,11 @@ import com.google.common.collect.ImmutableMap;
 import dev.spaceseries.spacechat.api.config.generic.KeyedConfiguration;
 import dev.spaceseries.spacechat.api.config.generic.key.ConfigKey;
 import dev.spaceseries.spacechat.api.config.generic.key.SimpleConfigKey;
+import dev.spaceseries.spacechat.parser.itemchat.DataPath;
 import dev.spaceseries.spacechat.storage.impl.sql.mysql.StorageCredentials;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import static dev.spaceseries.spacechat.api.config.generic.key.ConfigKeyFactory.key;
 import static dev.spaceseries.spacechat.api.config.generic.key.ConfigKeyFactory.notReloadable;
@@ -73,13 +72,14 @@ public class SpaceChatConfigKeys {
     public static ConfigKey<Boolean> ITEM_CHAT_WITH_LORE_USE_CUSTOM = key(c -> c.getBoolean("item-chat.with.lore.use-custom", false));
     public static ConfigKey<List<String>> ITEM_CHAT_WITH_LORE_CUSTOM = key(c -> c.getStringList("item-chat.with.lore.custom", List.of()));
     public static ConfigKey<Integer> ITEM_CHAT_MAX_PER_MESSAGE = key(c -> c.getInteger("item-chat.max-per-message", 2));
-    public static ConfigKey<Set<String>> ITEM_CHAT_ALLOWED_TAGS = key(c -> new HashSet<>(c.getStringList("item-chat.allowed-tags", List.of())));
+    public static ConfigKey<DataPath> ITEM_CHAT_ALLOWED_TAGS = key(c -> DataPath.valueOf(c.getStringList("item-chat.allowed-tags", List.of())));
 
     public static ConfigKey<Boolean> USE_RELATIONAL_PLACEHOLDERS = key(c -> c.getBoolean("use-relational-placeholders", false));
 
     public static ConfigKey<List<String>> FAKE_PLAYERS = key(c -> c.getStringList("fake-players", List.of()));
 
     public static ConfigKey<XSound> PRIVATE_NOTIFICATION_SOUND = key(c -> XSound.matchXSound(c.getString("private.notification.sound", "ENTITY_PLAYER_LEVELUP")).orElse(XSound.ENTITY_PLAYER_LEVELUP));
+    public static ConfigKey<Long> PRIVATE_COOLDOWN = key(c -> c.getLong("private.cooldown", 2000L));
 
     private static final List<SimpleConfigKey<?>> KEYS = KeyedConfiguration.initialise(SpaceChatConfigKeys.class);
 

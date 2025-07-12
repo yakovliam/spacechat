@@ -17,6 +17,12 @@ public interface ConfigKeyFactory<T> {
         return new SimpleConfigKey<>(function);
     }
 
+    static <T> SimpleConfigKey<T> memoize(Function<ConfigurationAdapter, T> function) {
+        final SimpleConfigKey<T> key = new SimpleConfigKey<>(function);
+        key.setMemoize(true);
+        return key;
+    }
+
     static <T> SimpleConfigKey<T> notReloadable(SimpleConfigKey<T> key) {
         key.setReloadable(false);
         return key;

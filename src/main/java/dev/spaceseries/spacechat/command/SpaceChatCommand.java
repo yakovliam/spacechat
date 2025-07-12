@@ -9,11 +9,17 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 @CommandAlias("spacechat")
 @CommandPermission("space.chat.command")
 public class SpaceChatCommand extends dev.spaceseries.spacechat.api.command.SpaceChatCommand {
+
+    private static final Map<UUID, Long> COOLDOWN = new HashMap<>();
 
     public SpaceChatCommand(SpaceChatPlugin plugin) {
         super(plugin);
@@ -58,6 +64,22 @@ public class SpaceChatCommand extends dev.spaceseries.spacechat.api.command.Spac
                     Messages.getInstance(plugin).messageIgnoredPlayer.message(sender);
                     return;
                 }
+
+                if (sender instanceof Player) {
+                    final long cooldown = SpaceChatConfigKeys.PRIVATE_COOLDOWN.get(plugin.getSpaceChatConfig().getAdapter());
+                    if (cooldown > 0) {
+                        final long time = COOLDOWN.getOrDefault(((Player) sender).getUniqueId(), 0L);
+                        final long currentTime = System.currentTimeMillis();
+                        if (time > currentTime) {
+                            Messages.getInstance(plugin).messageCooldown.message(sender,
+                                    "%time%", String.valueOf(TimeUnit.MILLISECONDS.toSeconds(time - currentTime))
+                            );
+                            return;
+                        }
+                        COOLDOWN.put(((Player) sender).getUniqueId(), currentTime + cooldown);
+                    }
+                }
+
                 // Construct the message
                 final String messageStr = String.join(" ", args)
                         .replace(targetName, "") //Replace target to empty

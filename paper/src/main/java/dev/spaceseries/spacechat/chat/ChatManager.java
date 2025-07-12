@@ -25,7 +25,7 @@ import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.event.player.PlayerEvent;
 
 import java.util.Date;
 import java.util.List;
@@ -194,7 +194,7 @@ public class ChatManager implements Manager {
      * @param format  format
      * @param event   event
      */
-    public void sendChatMessage(Player from, String message, Format format, AsyncPlayerChatEvent event) {
+    public void sendChatMessage(Player from, Component message, Format format, PlayerEvent event) {
         // get player's current channel, and send through that (if null, that means 'global')
         Channel applicableChannel = serverDataSyncService.getCurrentChannel(from.getUniqueId());
 
@@ -207,7 +207,7 @@ public class ChatManager implements Manager {
             parsed = new SimpleParsedFormat(Component.text()
                     .append(Component.text(from.getDisplayName(), NamedTextColor.AQUA))
                     .append(Component.text("> ", NamedTextColor.GRAY))
-                    .append(Component.text(message))
+                    .append(message)
                     .build());
         } else { // if not null
             // get baseComponents from live builder
@@ -266,7 +266,7 @@ public class ChatManager implements Manager {
      * @param format  format format
      * @param event   event
      */
-    public void sendRelationalChatMessage(Player from, String message, Format format, AsyncPlayerChatEvent event) {
+    public void sendRelationalChatMessage(Player from, Component message, Format format, PlayerEvent event) {
         // do relational parsing
         Bukkit.getOnlinePlayers().forEach(to -> {
             Component component;
@@ -277,7 +277,7 @@ public class ChatManager implements Manager {
                 component = Component.text()
                         .append(Component.text(from.getDisplayName(), NamedTextColor.AQUA))
                         .append(Component.text("> ", NamedTextColor.GRAY))
-                        .append(Component.text(message))
+                        .append(message)
                         .build();
             } else { // if not null
                 // get baseComponents from live builder
@@ -304,7 +304,7 @@ public class ChatManager implements Manager {
             sampledComponent = Component.text()
                     .append(Component.text(from.getDisplayName(), NamedTextColor.AQUA))
                     .append(Component.text("> ", NamedTextColor.GRAY))
-                    .append(Component.text(message))
+                    .append(message)
                     .build();
         } else { // if not null
             // get baseComponents from live builder

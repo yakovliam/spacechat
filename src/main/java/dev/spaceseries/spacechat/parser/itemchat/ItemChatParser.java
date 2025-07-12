@@ -33,7 +33,7 @@ import java.util.*;
                 repository = @Repository(url = "https://repo.codemc.io/repository/maven-public"),
                 relocate = {"me.pikamug.localelib", "{package}.lib.localelib"}
         ),
-        @Dependency(value = "com.saicone.rtag:rtag-item:1.5.6",
+        @Dependency(value = "com.saicone.rtag:rtag-item:1.5.11",
                 repository = @Repository(url = "https://jitpack.io"),
                 relocate = {"com.saicone.rtag", "{package}.lib.rtag"}
         )
@@ -77,6 +77,7 @@ public class ItemChatParser extends Parser {
         for (String s : SpaceChatConfigKeys.ITEM_CHAT_REPLACE_ALIASES.get(configuration)) {
             if (componentContains(message, s)) {
                 containsItemChatAliases = true;
+                break;
             }
         }
 
@@ -244,18 +245,17 @@ public class ItemChatParser extends Parser {
 
         if (ServerInstance.Release.COMPONENT) {
             final Map<Key, DataComponentValue> map = new HashMap<>();
-            final Object components = compound.get("components");
-            if (components != null) {
-                for (Map.Entry<String, Object> entry : TagCompound.getValue(components).entrySet()) {
-                    map.put(Key.key(entry.getKey()), BinaryTagHolder.binaryTagHolder(entry.getValue().toString()));
-                }
-            }
+            ItemDataFilter.filterItemComponents(compound, (component, value) -> {
+                map.put(Key.key(component), BinaryTagHolder.binaryTagHolder(value.toString()));
+            });
             return HoverEvent.showItem(HoverEvent.ShowItem.showItem(key, item.getAmount(), map));
         } else {
             Object tag = compound.get("tag");
-            final Set<String> allowedTags;
+            final DataPath allowedTags;
             if (tag != null && !(allowedTags = SpaceChatConfigKeys.ITEM_CHAT_ALLOWED_TAGS.get(configuration)).isEmpty()) {
-                TagCompound.getValue(tag).entrySet().removeIf(entry -> !allowedTags.contains(entry.getKey()));
+                if (!ItemDataFilter.filter(tag, allowedTags)) {
+                    tag = null;
+                }
             }
             return HoverEvent.showItem(key, item.getAmount(), tag == null ? null : BinaryTagHolder.binaryTagHolder(tag.toString()));
         }

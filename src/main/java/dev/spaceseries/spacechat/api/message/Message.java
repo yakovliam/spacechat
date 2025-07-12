@@ -1,16 +1,14 @@
 package dev.spaceseries.spacechat.api.message;
 
-import com.google.common.base.Joiner;
 import com.saicone.ezlib.Dependencies;
 import com.saicone.ezlib.Dependency;
 import com.saicone.ezlib.Repository;
 import dev.spaceseries.spacechat.SpaceChatPlugin;
 import dev.spaceseries.spacechat.api.config.generic.adapter.ConfigurationAdapter;
-import me.mattstudios.msg.adventure.AdventureMessage;
-import me.mattstudios.msg.base.MessageOptions;
 import net.kyori.adventure.platform.AudienceProvider;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -21,51 +19,33 @@ import java.util.List;
 @Dependencies(value = {
         // Non-paper servers
         @Dependency(
-                value = "net.kyori:adventure-api:4.17.0",
+                value = "net.kyori:adventure-api:4.23.0",
                 repository = @Repository(url = "MavenCentral"),
-                condition = "paper=false",
+                condition = {"paper=false", "adventure=true"},
                 relocate = {
                         "net.kyori.adventure", "{package}.lib.adventure",
-                        "net.kyori.examination", "{package}.lib.examination"
+                        "net.kyori.examination", "{package}.lib.examination",
+                        "net.kyori.option", "{package}.lib.option"
                 }
         ),
         @Dependency(
-                value = "net.kyori:adventure-platform-bukkit:4.3.3",
+                value = "net.kyori:adventure-platform-bukkit:4.4.0",
                 repository = @Repository(url = "MavenCentral"),
-                condition = "paper=false",
+                condition = {"paper=false", "adventure=true"},
                 relocate = {
                         "net.kyori.adventure", "{package}.lib.adventure",
-                        "net.kyori.examination", "{package}.lib.examination"
+                        "net.kyori.examination", "{package}.lib.examination",
+                        "net.kyori.option", "{package}.lib.option"
                 }
         ),
         @Dependency(
-                value = "net.kyori:adventure-text-minimessage:4.17.0",
+                value = "net.kyori:adventure-text-minimessage:4.23.0",
                 repository = @Repository(url = "MavenCentral"),
-                condition = "paper=false",
+                condition = {"paper=false", "adventure=true"},
                 relocate = {
                         "net.kyori.adventure", "{package}.lib.adventure",
-                        "net.kyori.examination", "{package}.lib.examination"
-                }
-        ),
-        @Dependency(
-                value = "me.mattstudios:triumph-msg-adventure:2.2.4-SNAPSHOT",
-                snapshot = true,
-                repository = @Repository(url = "https://repo.triumphteam.dev/snapshots/"),
-                condition = "paper=false",
-                relocate = {
-                        "me.mattstudios.msg", "{package}.lib.msg",
-                        "net.kyori.adventure", "{package}.lib.adventure",
-                        "net.kyori.examination", "{package}.lib.examination"
-                }
-        ),
-        // Paper servers
-        @Dependency(
-                value = "me.mattstudios:triumph-msg-adventure:2.2.4-SNAPSHOT",
-                snapshot = true,
-                repository = @Repository(url = "https://repo.triumphteam.dev/snapshots/"),
-                condition = "paper=true",
-                relocate = {
-                        "me.mattstudios.msg", "{package}.lib.msg"
+                        "net.kyori.examination", "{package}.lib.examination",
+                        "net.kyori.option", "{package}.lib.option"
                 }
         )
 })
@@ -91,7 +71,7 @@ public class Message {
     public static Message fromConfigurationSection(String identifier, ConfigurationAdapter adapter) {
         // get lines list from adapter
         List<String> lines = adapter.getStringList(identifier, Collections.emptyList());
-        return new Message(identifier, lines, null);
+        return new Message(identifier, lines);
     }
 
     /**
@@ -125,20 +105,14 @@ public class Message {
     private final List<String> lines;
 
     /**
-     * Message options
-     */
-    private final MessageOptions messageOptions;
-
-    /**
      * Message
      *
      * @param identifier identifier
      * @param lines      lines
      */
-    public Message(String identifier, List<String> lines, MessageOptions messageOptions) {
+    public Message(String identifier, List<String> lines) {
         this.identifier = identifier;
         this.lines = lines;
-        this.messageOptions = messageOptions;
     }
 
     /**
@@ -160,28 +134,22 @@ public class Message {
     }
 
     /**
-     * Returns the message options
-     *
-     * @return message options
-     */
-    public MessageOptions getMessageOptions() {
-        return messageOptions;
-    }
-
-    /**
      * Parses the message into a component
      *
      * @return component
      */
     private Component parse() {
-        // adventure message
-        AdventureMessage adventureMessage = messageOptions != null ? AdventureMessage.create(messageOptions) : AdventureMessage.create();
-
-        // convert lines into one line
-        String line = Joiner.on("\\n").join(lines);
-
         // parse into component
-        return adventureMessage.parse(line);
+        Component component = null;
+        for (String line : lines) {
+            if (component == null) {
+                component = LegacyComponentSerializer.legacyAmpersand().deserialize(line);
+            } else {
+                component = component.appendNewline().append(LegacyComponentSerializer.legacyAmpersand().deserialize(line));
+            }
+        }
+
+        return component;
     }
 
     /**
@@ -265,11 +233,6 @@ public class Message {
         private final List<String> lines;
 
         /**
-         * Message options
-         */
-        private MessageOptions messageOptions;
-
-        /**
          * Builder
          *
          * @param identifier identifier
@@ -316,32 +279,12 @@ public class Message {
         }
 
         /**
-         * Sets message options
-         *
-         * @param messageOptions message options
-         * @return this
-         */
-        public Builder setMessageOptions(MessageOptions messageOptions) {
-            this.messageOptions = messageOptions;
-            return this;
-        }
-
-        /**
-         * Returns the message options
-         *
-         * @return message options
-         */
-        public MessageOptions getMessageOptions() {
-            return messageOptions;
-        }
-
-        /**
          * Builds a builder into a message
          *
          * @return message
          */
         public Message build() {
-            return new Message(this.identifier, this.lines, this.messageOptions);
+            return new Message(this.identifier, this.lines);
         }
     }
 }

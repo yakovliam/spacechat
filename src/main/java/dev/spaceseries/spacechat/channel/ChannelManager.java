@@ -5,8 +5,9 @@ import dev.spaceseries.spacechat.loader.ChannelLoader;
 import dev.spaceseries.spacechat.model.ChannelType;
 import dev.spaceseries.spacechat.model.Channel;
 import dev.spaceseries.spacechat.model.manager.MapManager;
+import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.event.player.PlayerEvent;
 
 import java.util.Locale;
 
@@ -47,7 +48,7 @@ public class ChannelManager extends MapManager<String, Channel> {
      * @param event   The event
      * @param message The message
      */
-    public void send(AsyncPlayerChatEvent event, String message, Channel channel) {
+    public void send(PlayerEvent event, Component message, Channel channel) {
         // get player
         Player player = event.getPlayer();
 

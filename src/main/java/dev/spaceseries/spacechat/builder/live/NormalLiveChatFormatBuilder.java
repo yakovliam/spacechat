@@ -1,7 +1,6 @@
 package dev.spaceseries.spacechat.builder.live;
 
 import dev.spaceseries.spacechat.SpaceChatPlugin;
-import dev.spaceseries.spacechat.config.SpaceChatConfigKeys;
 import dev.spaceseries.spacechat.model.formatting.Extra;
 import dev.spaceseries.spacechat.model.formatting.Format;
 import dev.spaceseries.spacechat.model.formatting.ParsedFormat;
@@ -41,16 +40,16 @@ public class NormalLiveChatFormatBuilder extends LiveChatFormatBuilder {
     /**
      * Builds an array of baseComponents from a message, player, and format
      *
-     * @param player        the player that send the message
-     * @param messageString the message as string
-     * @param format        the format to parse the provided player and message
-     * @param conditional   true if the builder accept conditional formats
-     * @return              a parsed format using provided arguments
+     * @param player      the player that send the message
+     * @param message     the message as component
+     * @param format      the format to parse the provided player and message
+     * @param conditional true if the builder accept conditional formats
+     * @return            a parsed format using provided arguments
      */
-    public ParsedFormat build(Player player, String messageString, Format format, boolean conditional) {
+    public ParsedFormat build(Player player, Component message, Format format, boolean conditional) {
         if (conditional && format.isConditional()) {
             final List<ParsedFormatPart> parts = new ArrayList<>();
-            build(player, messageString, format, false, (textComponent, lineComponent, lineProtocol) -> {
+            build(player, message, format, false, (textComponent, lineComponent, lineProtocol) -> {
                 parts.add(new ParsedFormatPart(
                         textComponent == null ? null : Component.text().append(textComponent).build(),
                         lineComponent == null ? null : Component.text().append(lineComponent).build(),
@@ -60,7 +59,7 @@ public class NormalLiveChatFormatBuilder extends LiveChatFormatBuilder {
             return new ConditionalParsedFormat(parts);
         } else {
             final ComponentBuilder<TextComponent, TextComponent.Builder> partComponentBuilder = Component.text();
-            build(player, messageString, format, true, (textComponent, lineComponent, lineProtocol) -> {
+            build(player, message, format, true, (textComponent, lineComponent, lineProtocol) -> {
                 if (lineComponent != null) {
                     partComponentBuilder.append(lineComponent);
                 } else {
@@ -71,7 +70,7 @@ public class NormalLiveChatFormatBuilder extends LiveChatFormatBuilder {
         }
     }
 
-    private void build(Player player, String messageString, Format format, boolean line, FormatPartConsumer consumer) {
+    private void build(Player player, Component message, Format format, boolean line, FormatPartConsumer consumer) {
         // loop through format parts
         format.getFormatParts().forEach(formatPart -> {
             // create component builder
@@ -81,21 +80,11 @@ public class NormalLiveChatFormatBuilder extends LiveChatFormatBuilder {
                 // replace placeholders
                 String mmWithPlaceholdersReplaced = SECTION_REPLACER.apply(PlaceholderAPI.setPlaceholders(player, AMPERSAND_REPLACER.apply(formatPart.getLine(), player)), player);
 
-                // get chat message (formatted)
-                final String msg = MiniMessage.miniMessage().escapeTags(messageString);
-                String chatMessage = LegacyComponentSerializer
-                        .legacySection()
-                        .serialize(player.hasPermission(SpaceChatConfigKeys.PERMISSIONS_USE_CHAT_COLORS.get(plugin.getSpaceChatConfig().getAdapter())) ? // if player has permission to use chat colors
-                                LegacyComponentSerializer // yes, the player has permission to use chat colors, so color message
-                                        .legacyAmpersand()
-                                        .deserialize(msg) :
-                                Component.text(msg)); // no, the player doesn't have permission to use chat colors, so just return the message (not colored)
-
                 // parse message
-                Component message = new MessageParser(plugin).parse(player, Component.text(chatMessage));
+                Component parsedMessage = new MessageParser(plugin).parse(player, message);
 
                 // parse miniMessage
-                parsedMiniMessage = MiniMessage.miniMessage().deserialize(mmWithPlaceholdersReplaced.replace("<chat_message>", MiniMessage.miniMessage().serialize(message)));
+                parsedMiniMessage = MiniMessage.miniMessage().deserialize(mmWithPlaceholdersReplaced.replace("<chat_message>", MiniMessage.miniMessage().serialize(parsedMessage)));
 
                 if (line || formatPart.getText() == null) {
                     consumer.accept(null, parsedMiniMessage, -1);
@@ -113,11 +102,8 @@ public class NormalLiveChatFormatBuilder extends LiveChatFormatBuilder {
             // and check permissions for chat colors
             Component parsedText;
 
-            Component messageComponent = computeChatMessageComponentSerializer(player)
-                    .deserialize(messageString);
-
             parsedText = LegacyComponentSerializer.legacyAmpersand().deserialize(text)
-                    .replaceText((b) -> b.matchLiteral("<chat_message>").replacement(messageComponent));
+                    .replaceText((b) -> b.matchLiteral("<chat_message>").replacement(message));
 
             // parse message
             parsedText = new MessageParser(plugin).parse(player, parsedText);
@@ -143,27 +129,6 @@ public class NormalLiveChatFormatBuilder extends LiveChatFormatBuilder {
 
             consumer.accept(parsedText, parsedMiniMessage, formatPart.getLineProtocol());
         });
-    }
-
-    /**
-     * Computes the legacy component serializer based on player context for chat messages
-     *
-     * @param player player
-     * @return legacy component serializer
-     */
-    private LegacyComponentSerializer computeChatMessageComponentSerializer(Player player) {
-        LegacyComponentSerializer.Builder legacyComponentSerializerBuilder = LegacyComponentSerializer.builder();
-
-        if (player.hasPermission(SpaceChatConfigKeys.PERMISSIONS_USE_CHAT_COLORS.get(plugin.getSpaceChatConfig().getAdapter()))) {
-            legacyComponentSerializerBuilder = legacyComponentSerializerBuilder.hexColors();
-            legacyComponentSerializerBuilder = legacyComponentSerializerBuilder.character('&');
-        }
-
-        if (player.hasPermission(SpaceChatConfigKeys.PERMISSIONS_USE_CHAT_LINKS.get(plugin.getSpaceChatConfig().getAdapter()))) {
-            legacyComponentSerializerBuilder = legacyComponentSerializerBuilder.extractUrls();
-        }
-
-        return legacyComponentSerializerBuilder.build();
     }
 
     @FunctionalInterface

@@ -94,6 +94,7 @@ message:
       - "&8(&6Me &7▻ &e%receiver%&8) &f%message%"
     receive:
       - "&8(&6%sender% &7▻ &eMe&8) &f%message%"
+  cooldown: '&cYou should wait &6%time% seconds &cto send another private message'
 reply:
   args:
     - "&cInvalid args, correct usage: /r (message)"

@@ -13,12 +13,13 @@ import org.spongepowered.configurate.serialize.SerializationException;
 import java.time.Instant;
 import java.util.*;
 
-@Dependency(value = "org.spongepowered:configurate-gson:4.1.2",
+@Dependency(value = "org.spongepowered:configurate-gson:4.2.0",
         relocate = {
                 "org.spongepowered.configurate", "{package}.lib.configurate",
                 "io.leangen.geantyref", "{package}.lib.geantyref",
                 "org.checkerframework", "{package}.lib.checkerframework",
-                "com.google.errorprone.annotations", "{package}.lib.annotations.errorprone"
+                "com.google.errorprone.annotations", "{package}.lib.annotations.errorprone",
+                "net.kyori.option", "{package}.lib.option"
         }
 )
 public class JsonStorage extends Storage {

@@ -1,25 +1,22 @@
 package dev.spaceseries.spacechat.builder.format.part;
 
 import dev.spaceseries.spacechat.api.config.generic.adapter.ConfigurationAdapter;
-import dev.spaceseries.spacechat.api.wrapper.Pair;
-import dev.spaceseries.spacechat.builder.Builder;
 import dev.spaceseries.spacechat.builder.extra.ExtraBuilder;
 import dev.spaceseries.spacechat.model.formatting.FormatPart;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class FormatPartBuilder implements Builder<Pair<String, ConfigurationAdapter>, List<FormatPart>> {
+public class FormatPartBuilder {
 
     /**
      * Builds an V (output) from a K (input)
      *
-     * @param input The input
+     * @param path
+     * @param adapter
+     * @return
      */
-    @Override
-    public List<FormatPart> build(Pair<String, ConfigurationAdapter> input) {
-        ConfigurationAdapter adapter = input.getRight();
-        String path = input.getLeft();
+    public List<FormatPart> build(String path, ConfigurationAdapter adapter) {
 
         // create list
         List<FormatPart> formatPartList = new ArrayList<>();
@@ -40,7 +37,7 @@ public class FormatPartBuilder implements Builder<Pair<String, ConfigurationAdap
             // if extra exists, parse
             if (extraKeys != null) {
                 // set extra
-                formatPart.setExtra(new ExtraBuilder().build(new Pair<>(path + "." + handle + ".extra", adapter)));
+                formatPart.setExtra(new ExtraBuilder().build(path + "." + handle + ".extra", adapter));
             }
 
             String line = adapter.getString(path + "." + handle + ".line", null);

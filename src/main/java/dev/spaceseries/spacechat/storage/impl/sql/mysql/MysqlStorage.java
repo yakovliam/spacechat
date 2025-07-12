@@ -11,6 +11,7 @@ import dev.spaceseries.spacechat.storage.Storage;
 import dev.spaceseries.spacechat.storage.StorageInitializationException;
 import dev.spaceseries.spacechat.storage.impl.sql.mysql.factory.MySqlConnectionFactory;
 import dev.spaceseries.spacechat.util.date.DateUtil;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 
 import java.sql.Connection;
@@ -433,7 +434,7 @@ public class MysqlStorage extends Storage {
                 // replace
                 preparedStatement.setString(1, data.getSenderUUID().toString());
                 preparedStatement.setString(2, data.getSenderName());
-                preparedStatement.setString(3, data.getMessage());
+                preparedStatement.setString(3, MiniMessage.miniMessage().serialize(data.getMessage()));
                 preparedStatement.setString(4, DateUtil.toString(data.getAt()));
 
                 // execute

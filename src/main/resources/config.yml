@@ -150,26 +150,59 @@ item-chat:
   # Set to -1 to disable the maximum amount
   max-per-message: 2
   # Whitelist item NBT tag
+  # If a tag path ends with ".[]" means that contains more items inside
   allowed-tags:
-    - "CustomModelData"
-    - "Damage"
-    - "HideFlags"
-    - "Unbreakable"
-    - "Enchantments"
-    - "StoredEnchantments"
-    - "display"
-    - "AttributeModifiers"
-    - "CanPlaceOn"
-    - "CanDestroy"
-    - "Potion"
-    - "CustomPotionColor"
-    - "CustomPotionEffects"
-    - "map"
-    - "SkullOwner"
-    - "Fireworks"
-    - "Items"
-    - "author"
-    - "title"
+    - RepairCost
+    - Unbreakable
+    - display
+    - Decorations
+    - map
+    - CanDestroy
+    - CanPlaceOn
+    - AttributeModifiers
+    - ChargedProjectiles
+    - Items.[]
+    - CustomModelData
+    - Trim
+    - Effects # pre 1.20.2
+    - effects
+    - DebugProperty
+    - EntityTag
+    - instrument
+    - Recipes
+    - SkullOwner
+    - BlockEntityTag.Items.[]
+    - BlockEntityTag
+    - BlockStateTag
+    - Potion
+    - CustomPotionColor
+    - CustomPotionEffects # pre 1.20.2
+    - custom_potion_effects
+    - filtered_pages
+    - filtered_title
+    - pages
+    - title
+    - author
+    - generation
+    - resolved
+    - NoAI
+    - Silent
+    - NoGravity
+    - Glowing
+    - Invulnerable
+    - Health
+    - Age
+    - Variant
+    - HuntingCooldown
+    - BucketVariantTag
+    - LodestoneTracked
+    - LodestonePos
+    - LodestoneDimension
+    - Explosion
+    - Fireworks
+    - Damage
+    - ench # pre 1.13
+    - Enchantments
 
 # Enables or disables relational placeholders
 # <!> <!> <!> <!> <!> You can only enable this if your server is [NOT] USING MULTI-SERVER CAPABILITIES (redis, etc) <!> <!> <!> <!> <!> Y

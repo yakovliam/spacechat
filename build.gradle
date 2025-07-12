@@ -1,7 +1,7 @@
 plugins {
     id 'java'
     id 'idea'
-    id 'com.gradleup.shadow' version '8.3.1'
+    id 'com.gradleup.shadow' version '8.3.5'
 }
 
 allprojects {
@@ -48,45 +48,43 @@ allprojects {
 
     dependencies {
         // Compile
-        compileOnly 'me.clip:placeholderapi:2.11.6'
-        compileOnly 'net.essentialsx:EssentialsX:2.20.1'
+        compileOnly('me.clip:placeholderapi:2.11.6') { transitive = false }
+        compileOnly('net.essentialsx:EssentialsX:2.21.0') { transitive = false }
 
         //compileOnly 'com.google.code.gson:gson:2.8.0'
         //compileOnly 'com.google.guava:guava:21.0'
-        compileOnly 'org.jetbrains:annotations:24.1.0'
+        compileOnly 'org.jetbrains:annotations:26.0.2'
 
 
         // Library loader
-        implementation 'com.saicone.ezlib:loader:1.2.3'
-        compileOnly 'com.saicone.ezlib:annotations:1.2.3'
+        implementation 'com.saicone.ezlib:loader:1.3.1'
+        compileOnly 'com.saicone.ezlib:annotations:1.3.1'
 
         // Protocol
-        compileOnly 'com.viaversion:viaversion-api:5.0.1'
-        compileOnly 'io.netty:netty-all:4.0.20.Final'
-        compileOnly 'com.comphenix.protocol:ProtocolLib:5.1.0'
+        compileOnly 'com.viaversion:viaversion-api:5.4.1'
+        compileOnly 'io.netty:netty-all:4.2.2.Final'
+        compileOnly 'com.comphenix.protocol:ProtocolLib:5.3.0'
 
         // Implementations
-        compileOnly 'org.bstats:bstats-bukkit:3.0.2'
+        compileOnly 'org.bstats:bstats-bukkit:3.1.0'
 
-        compileOnly 'com.github.ben-manes.caffeine:caffeine:3.1.8'
-
-        compileOnly 'me.mattstudios:triumph-msg-adventure:2.2.4-SNAPSHOT'
+        compileOnly 'com.github.ben-manes.caffeine:caffeine:3.2.1'
 
         compileOnly 'co.aikar:acf-bukkit:0.5.1-SNAPSHOT'
 
         // Only used with reflection
-        //compileOnly 'mysql:mysql-connector-java:8.0.30'
-        compileOnly 'redis.clients:jedis:4.4.6'
-        compileOnly 'com.zaxxer:HikariCP:5.0.1'
+        //compileOnly 'com.mysql:mysql-connector-j:9.2.0'
+        compileOnly 'redis.clients:jedis:5.2.0'
+        compileOnly 'com.zaxxer:HikariCP:6.3.0'
 
-        compileOnly 'org.spongepowered:configurate-gson:4.1.2'
-        compileOnly 'me.pikamug.localelib:LocaleLib:4.0.0'
+        compileOnly 'org.spongepowered:configurate-gson:4.2.0'
+        compileOnly 'me.pikamug.localelib:LocaleLib:4.1.2'
         compileOnly 'commons-lang:commons-lang:2.6'
 
-        compileOnly 'com.saicone.rtag:rtag:1.5.6'
-        compileOnly 'com.saicone.rtag:rtag-item:1.5.6'
+        compileOnly 'com.saicone.rtag:rtag:1.5.11'
+        compileOnly 'com.saicone.rtag:rtag-item:1.5.11'
 
-        compileOnly('com.github.cryptomorin:XSeries:11.2.1') { transitive = false }
+        compileOnly('com.github.cryptomorin:XSeries:13.2.0') { transitive = false }
     }
 
     compileJava {
@@ -111,7 +109,6 @@ allprojects {
         relocate 'com.saicone.ezlib', project.group + '.lib.ezlib'
         relocate 'org.bstats', project.group + '.lib.bstats'
         relocate 'com.github.benmanes.caffeine.cache', project.group + '.lib.caffeine'
-        relocate 'me.mattstudios.msg', project.group + '.lib.msg'
         relocate 'co.aikar.commands', project.group + '.lib.acf.commands'
         relocate 'co.aikar.locales', project.group + '.lib.acf.locales'
         relocate 'com.mysql', project.group + '.lib.mysql'
@@ -145,15 +142,16 @@ processResources {
 
 dependencies {
     // Compile
-    compileOnly 'org.spigotmc:spigot-api:1.21.1-R0.1-SNAPSHOT'
+    compileOnly 'org.spigotmc:spigot-api:1.21.7-R0.1-SNAPSHOT'
 
     // Library loader
-    annotationProcessor 'com.saicone.ezlib:annotations:1.2.3'
+    annotationProcessor 'com.saicone.ezlib:annotations:1.3.1'
 
     // Implementations
-    compileOnly 'net.kyori:adventure-api:4.17.0'
-    compileOnly 'net.kyori:adventure-platform-bukkit:4.3.3'
-    compileOnly 'net.kyori:adventure-text-minimessage:4.17.0'
+    compileOnly 'net.kyori:adventure-api:4.23.0'
+    compileOnly 'net.kyori:adventure-platform-bukkit:4.4.0'
+    compileOnly 'net.kyori:adventure-text-minimessage:4.23.0'
+    compileOnly 'net.kyori:adventure-text-serializer-legacy:4.23.0'
 }
 
 shadowJar {
@@ -164,4 +162,5 @@ shadowJar {
     relocate 'load.adventure', 'true'
     relocate 'net.kyori.adventure', project.group + '.lib.adventure'
     relocate 'net.kyori.examination', project.group + '.lib.examination'
+    relocate 'net.kyori.option', project.group + '.lib.option'
 }

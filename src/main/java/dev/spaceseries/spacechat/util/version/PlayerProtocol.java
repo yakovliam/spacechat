@@ -17,7 +17,7 @@ public class PlayerProtocol {
     private static final Supplier<Boolean> VIAVERSION = Suppliers.memoize(() -> Bukkit.getPluginManager().isPluginEnabled("ViaVersion"));
     private static final Supplier<Boolean> PROTOCOLLIB = Suppliers.memoize(() -> Bukkit.getPluginManager().isPluginEnabled("ProtocolLib"));
 
-    private static final Cache<UUID, Integer> CACHE = CacheBuilder.newBuilder().expireAfterAccess(5, TimeUnit.MINUTES).build();
+    private static final Cache<UUID, Integer> CACHE = CacheBuilder.newBuilder().expireAfterWrite(5, TimeUnit.MINUTES).build();
 
     PlayerProtocol() {
     }

@@ -3,6 +3,7 @@ package dev.spaceseries.spacechat.parser.itemchat;
 import com.saicone.ezlib.Dependencies;
 import com.saicone.ezlib.Dependency;
 import com.saicone.ezlib.Repository;
+import com.saicone.rtag.util.ServerInstance;
 import dev.spaceseries.spacechat.SpaceChatPlugin;
 import dev.spaceseries.spacechat.api.config.generic.adapter.ConfigurationAdapter;
 import dev.spaceseries.spacechat.config.SpaceChatConfigKeys;
@@ -25,7 +26,7 @@ import java.util.*;
                 repository = @Repository(url = "https://repo.codemc.io/repository/maven-public"),
                 relocate = {"me.pikamug.localelib", "{package}.lib.localelib"}
         ),
-        @Dependency(value = "com.saicone.rtag:rtag-item:1.5.6",
+        @Dependency(value = "com.saicone.rtag:rtag-item:1.5.9",
                 repository = @Repository(url = "https://jitpack.io"),
                 relocate = {"com.saicone.rtag", "{package}.lib.rtag"}
         )
@@ -69,6 +70,7 @@ public class ItemChatParser extends Parser {
         for (String s : SpaceChatConfigKeys.ITEM_CHAT_REPLACE_ALIASES.get(configuration)) {
             if (componentContains(message, s)) {
                 containsItemChatAliases = true;
+                break;
             }
         }
 
@@ -157,7 +159,14 @@ public class ItemChatParser extends Parser {
             hoverEvent = HoverEvent.showText(loreBuilder.build());
         } else {
             // show item
-            hoverEvent = itemStack.asHoverEvent();
+            final DataPath allowedTags;
+            if (ServerInstance.Release.COMPONENT) {
+                hoverEvent = ItemDataFilter.filterItemComponents(itemStack).asHoverEvent();
+            } else if (!(allowedTags = SpaceChatConfigKeys.ITEM_CHAT_ALLOWED_TAGS.get(configuration)).isEmpty()) {
+                hoverEvent = ItemDataFilter.filterItemTag(itemStack, allowedTags).asHoverEvent();
+            } else {
+                hoverEvent = itemStack.asHoverEvent();
+            }
         }
 
         itemMessage = itemMessage.hoverEvent(hoverEvent);

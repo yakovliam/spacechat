@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Abstract {@link ConnectionFactory} using a {@link HikariDataSource}.
  */
-@Dependency(value = "com.zaxxer:HikariCP:5.0.1",
+@Dependency(value = "com.zaxxer:HikariCP:6.3.0",
         relocate = {
                 "com.zaxxer.hikari", "{package}.lib.hikari"
         }

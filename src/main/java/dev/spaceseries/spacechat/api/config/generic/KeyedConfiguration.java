@@ -38,6 +38,9 @@ public class KeyedConfiguration {
     protected void load(boolean initial) {
         for (ConfigKey<?> key : this.keys) {
             if (initial || key.reloadable()) {
+                if (key.memoize()) {
+                    key.clear();
+                }
                 this.values.put(key, key.get(this.adapter));
             }
         }

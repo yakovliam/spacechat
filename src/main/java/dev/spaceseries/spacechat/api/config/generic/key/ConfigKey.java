@@ -23,6 +23,10 @@ public interface ConfigKey<T> {
      */
     boolean reloadable();
 
+    boolean memoize();
+
+    void clear();
+
     /**
      * Resolves and returns the value mapped to this key using the given config instance.
      *

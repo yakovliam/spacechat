@@ -14,8 +14,6 @@ import dev.spaceseries.spacechat.replacer.SectionReplacer;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.entity.Player;
 
-import static dev.spaceseries.spacechat.config.SpaceChatConfigKeys.PERMISSIONS_USE_CHAT_COLORS;
-
 public class RelationalLiveChatFormatBuilder extends LiveChatFormatBuilder {
 
     /**
@@ -35,13 +33,13 @@ public class RelationalLiveChatFormatBuilder extends LiveChatFormatBuilder {
     /**
      * Builds an array of baseComponents from a message, player, and format
      *
-     * @param fromPlayer    the player that send the message
-     * @param toPlayer      the player that will receive the message
-     * @param messageString the message as string
-     * @param format        the format to parse the provided player and message
-     * @return              a text component using provided arguments
+     * @param fromPlayer the player that send the message
+     * @param toPlayer   the player that will receive the message
+     * @param message    the message as component
+     * @param format     the format to parse the provided player and message
+     * @return           a text component using provided arguments
      */
-    public TextComponent build(Player fromPlayer, Player toPlayer, String messageString, Format format) {
+    public TextComponent build(Player fromPlayer, Player toPlayer, Component message, Format format) {
         // create component builder for message
         ComponentBuilder<TextComponent, TextComponent.Builder> componentBuilder = Component.text();
 
@@ -56,23 +54,14 @@ public class RelationalLiveChatFormatBuilder extends LiveChatFormatBuilder {
                 // replace relational and apply section replacer
                 mmWithPlaceholdersReplaced = SECTION_REPLACER.apply(PlaceholderAPI.setRelationalPlaceholders(fromPlayer, toPlayer, mmWithPlaceholdersReplaced), fromPlayer);
 
-                // get chat message (formatted)
-                String chatMessage = LegacyComponentSerializer
-                        .legacySection()
-                        .serialize(fromPlayer.hasPermission(PERMISSIONS_USE_CHAT_COLORS.get(plugin.getSpaceChatConfig().getAdapter())) ? // if player has permission to use chat colors
-                                LegacyComponentSerializer // yes, the player has permission to use chat colors, so color message
-                                        .legacyAmpersand()
-                                        .deserialize(messageString) :
-                                Component.text(messageString)); // no, the player doesn't have permission to use chat colors, so just return the message (not colored)
-
                 // parse message
-                Component message = new MessageParser(plugin).parse(fromPlayer, Component.text(chatMessage));
+                Component parsedMessage = new MessageParser(plugin).parse(fromPlayer, message);
 
                 // parse miniMessage
                 Component parsedMiniMessage = MiniMessage.miniMessage().deserialize(mmWithPlaceholdersReplaced);
 
                 // replace chat message
-                parsedMiniMessage = parsedMiniMessage.replaceText((text) -> text.match("<chat_message>").replacement(message));
+                parsedMiniMessage = parsedMiniMessage.replaceText((text) -> text.match("<chat_message>").replacement(parsedMessage));
 
                 // parse MiniMessage into builder
                 partComponentBuilder.append(parsedMiniMessage);
@@ -92,10 +81,7 @@ public class RelationalLiveChatFormatBuilder extends LiveChatFormatBuilder {
 
             // build text from legacy (and replace <chat_message> with the actual message)
             // and check permissions for chat colors
-            Component parsedText = fromPlayer.hasPermission(PERMISSIONS_USE_CHAT_COLORS.get(plugin.getSpaceChatConfig().getAdapter())) ? LegacyComponentSerializer.legacyAmpersand().deserialize(
-                    text.replace("<chat_message>", messageString)) :
-                    LegacyComponentSerializer.legacyAmpersand().deserialize(text).replaceText((b) -> b.match("<chat_message>")
-                            .replacement(messageString));
+            Component parsedText = LegacyComponentSerializer.legacyAmpersand().deserialize(text).replaceText((b) -> b.matchLiteral("<chat_message>").replacement(message));
 
             // parse message
             parsedText = new MessageParser(plugin).parse(fromPlayer, parsedText);

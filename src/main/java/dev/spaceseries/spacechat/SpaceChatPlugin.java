@@ -29,10 +29,10 @@ import java.nio.file.Path;
 
 @Dependencies(value = {
         @Dependency(
-                value = "org.bstats:bstats-bukkit:3.0.2",
+                value = "org.bstats:bstats-bukkit:3.1.0",
                 relocate = {"org.bstats", "{package}.lib.bstats"}),
         @Dependency(
-                value = "com.github.cryptomorin:XSeries:11.2.1",
+                value = "com.github.cryptomorin:XSeries:13.2.0",
                 relocate = {"com.cryptomorin.xseries", "{package}.lib.xseries"})
 }, relocations = {
         "org.jetbrains.annotations", "{package}.lib.annotations",
@@ -125,8 +125,8 @@ public final class SpaceChatPlugin extends JavaPlugin {
                             break;
                     }
                 })
-                .condition("paper", s -> s.equalsIgnoreCase("true") == PAPER_PLATFORM)
-                .condition("adventure", s -> s.equalsIgnoreCase("true") == LOAD_ADVENTURE)
+                .condition("paper", EzlibLoader.Condition.valueOf(PAPER_PLATFORM))
+                .condition("adventure", EzlibLoader.Condition.valueOf(LOAD_ADVENTURE))
                 .load();
     }
 
