@@ -92,7 +92,7 @@ public class SpaceChatCommand extends dev.spaceseries.spacechat.api.command.Spac
                 Message formatSend = Messages.getInstance(plugin).messageFormatSend;
 
                 // send a message to player in the same server if is connected
-                final Player target = Bukkit.getPlayer(targetName);
+                final Player target = Bukkit.getPlayerExact(targetName);
                 if (target != null) {
                     Messages.getInstance(plugin).messageFormatReceive.message(target,
                             "%sender%", senderName,
@@ -140,7 +140,7 @@ public class SpaceChatCommand extends dev.spaceseries.spacechat.api.command.Spac
         Message formatSend = Messages.getInstance(plugin).replyFormatSend;
 
         // send a message to player in the same server if is connected
-        final Player target = Bukkit.getPlayer(targetName);
+        final Player target = Bukkit.getPlayerExact(targetName);
         if (target != null) {
             Messages.getInstance(plugin).replyFormatReceive.message(target,
                     "%sender%", senderName,

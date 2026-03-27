@@ -6,6 +6,7 @@ import dev.spaceseries.spacechat.sync.packet.SendStreamDataPacket;
 import dev.spaceseries.spacechat.sync.redis.stream.packet.PacketType;
 import dev.spaceseries.spacechat.sync.redis.stream.packet.RedisPacket;
 
+import java.util.Set;
 import java.util.UUID;
 
 public class RedisChatPacket extends RedisPacket implements SendStreamDataPacket<Void> {
@@ -40,10 +41,12 @@ public class RedisChatPacket extends RedisPacket implements SendStreamDataPacket
      */
     private ParsedFormat parsedFormat;
 
+    private Set<String> mentionedPlayers;
+
     /**
      * Construct redis chat message
      */
-    public RedisChatPacket(UUID sender, String senderName, Channel channel, String serverIdentifier, String serverDisplayName, ParsedFormat parsedFormat) {
+    public RedisChatPacket(UUID sender, String senderName, Channel channel, String serverIdentifier, String serverDisplayName, ParsedFormat parsedFormat, Set<String> mentionedPlayers) {
         this();
         this.sender = sender;
         this.senderName = senderName;
@@ -51,6 +54,7 @@ public class RedisChatPacket extends RedisPacket implements SendStreamDataPacket
         this.serverIdentifier = serverIdentifier;
         this.serverDisplayName = serverDisplayName;
         this.parsedFormat = parsedFormat;
+        this.mentionedPlayers = mentionedPlayers;
     }
 
     /**
@@ -166,5 +170,14 @@ public class RedisChatPacket extends RedisPacket implements SendStreamDataPacket
      */
     public void setServerDisplayName(String serverDisplayName) {
         this.serverDisplayName = serverDisplayName;
+    }
+
+    /**
+     * Get the mentioned player names
+     *
+     * @return a player name set
+     */
+    public Set<String> getMentionedPlayers() {
+        return mentionedPlayers;
     }
 }

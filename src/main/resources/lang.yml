@@ -107,3 +107,10 @@ reply:
       - "&8(&6Me &7▻ &e%receiver%&8) &f%message%"
     receive:
       - "&8(&6%sender% &7▻ &eMe&8) &f%message%"
+mention:
+  send:
+    - "&eYou mentioned &b%player%&e!"
+  receive:
+    - "&eYou have been mentioned by &b%player%&e!"
+  ignored-player:
+    - "&cYou can't mention the player &6%player% &cbecause you're on their ignore list"

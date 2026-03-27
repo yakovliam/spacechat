@@ -3,13 +3,17 @@ package dev.spaceseries.spacechat.user;
 import com.github.benmanes.caffeine.cache.AsyncLoadingCache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.saicone.ezlib.Dependency;
+import dev.spaceseries.spacechat.Messages;
 import dev.spaceseries.spacechat.SpaceChatPlugin;
 import dev.spaceseries.spacechat.config.SpaceChatConfigKeys;
 import dev.spaceseries.spacechat.model.User;
 import dev.spaceseries.spacechat.model.manager.Manager;
 import dev.spaceseries.spacechat.storage.StorageManager;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -17,7 +21,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
-@Dependency(value = "com.github.ben-manes.caffeine:caffeine:3.2.1", relocate = {"com.github.benmanes.caffeine.cache", "{package}.lib.caffeine"})
+@Dependency(value = "com.github.ben-manes.caffeine:caffeine:3.2.3", relocate = {"com.github.benmanes.caffeine.cache", "{package}.lib.caffeine"})
 public class UserManager implements Manager {
 
     private final SpaceChatPlugin plugin;
@@ -235,6 +239,65 @@ public class UserManager implements Manager {
      */
     public Map<UUID, User> getAll() {
         return userAsyncCache.synchronous().asMap();
+    }
+
+    @NotNull
+    public Set<String> mention(@NotNull Player player, @NotNull Component component) {
+        if (!SpaceChatConfigKeys.CHAT_MENTION_ENABLED.get(plugin.getSpaceChatConfig().getAdapter()) || !AsyncPermission.check(player, SpaceChatConfigKeys.PERMISSIONS_MENTION_SEND.get(plugin.getSpaceChatConfig().getAdapter()))) {
+            return Set.of();
+        }
+        final Set<String> players = new HashSet<>();
+        findMentioned(player, component, players);
+        return players;
+    }
+
+    public void mention(@NotNull Player player, @NotNull Player receiver) {
+        mentionSend(player, receiver.getName());
+        mentionReceive(player.getName(), receiver);
+    }
+
+    public void mentionSend(@NotNull Player player, @NotNull String receiver) {
+        Messages.getInstance(plugin).mentionSend.message(player, "%player%", receiver);
+    }
+
+    public void mentionReceive(@NotNull String player, @NotNull Player receiver) {
+        if (AsyncPermission.check(receiver, SpaceChatConfigKeys.PERMISSIONS_MENTION_RECEIVE.get(plugin.getSpaceChatConfig().getAdapter()))) {
+            Messages.getInstance(plugin).mentionReceive.message(receiver, "%player%", player);
+            SpaceChatConfigKeys.CHAT_MENTION_SOUND.get(plugin.getSpaceChatConfig().getAdapter()).soundPlayer().forPlayers(receiver).play();
+        }
+    }
+
+    private void findMentioned(@NotNull Player player, @NotNull Component component, @NotNull Set<String> players) {
+        if (component instanceof TextComponent) {
+            final String text = ((TextComponent) component).content().toLowerCase();
+            if (text.indexOf('@') >= 0) {
+                for (String name : onlinePlayers.keySet()) {
+                    if (name.equalsIgnoreCase(player.getName())) {
+                        continue;
+                    }
+                    if (text.contains("@" + name.toLowerCase())) {
+                        final List<String> ignored = ignoredList.get(name);
+                        if (ignored != null && ignored.contains(player.getName())) { // TODO: Add multi-host support to this notification
+                            Messages.getInstance(plugin).mentionIgnoredPlayer.message(player, "%player%", name);
+                            continue;
+                        }
+
+                        mentionSend(player, name);
+
+                        final Player onlinePlayer = Bukkit.getPlayerExact(name);
+                        if (onlinePlayer != null) {
+                            mentionReceive(player.getName(), onlinePlayer);
+                        } else {
+                            players.add(name);
+                        }
+                    }
+                }
+            }
+        }
+
+        for (Component child : component.children()) {
+            findMentioned(player, child, players);
+        }
     }
 
     public void setOnlinePlayers(String id, List<String> players) {

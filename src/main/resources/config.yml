@@ -149,6 +149,9 @@ item-chat:
   # This dictates the maximum amount of times that players can use the item-chat feature in a single message
   # Set to -1 to disable the maximum amount
   max-per-message: 2
+  # The maximum amount of characters that item name can contain
+  # Set to -1 disable this restriction
+  max-characters: 20
   # Whitelist item NBT tag
   # If a tag path ends with ".[]" means that contains more items inside
   allowed-tags:
@@ -212,22 +215,43 @@ use-relational-placeholders: false
 fake-players:
   - "@console"
 
+# Chat messages configuration
+chat:
+  # Patterns in chat message without color
+  escape-color:
+    - '\\?\\?:(\S+?):'
+  # Mention configuration
+  mention:
+    # Enable or not this feature
+    enabled: true
+    # Sound record to play when mentioned
+    sound: 'ENTITY_EXPERIENCE_ORB_PICKUP, 3, 1'
+
 # Private messages configuration
 private:
   notification:
     sound: 'ENTITY_PLAYER_LEVELUP'
+  # Cooldown in milliseconds to send a private message
+  cooldown: 2000
 
-#=#=#=#=#=#=#=#=#=#=#=#=#=#
-# Permissions             #
-#                         #
-# For:                    #
-# Using chat colors (&)   #
-# Using chat links        #
-# Using item chat ([item])#
-#=#=#=#=#=#=#=#=#=#=#=#=#=#
+# Permissions configuration
 permissions:
+  # Allow to use chat colors (&)
   use-chat-colors: "space.chat.chatcolor"
+  # Allow to insert URLs on chat
   use-chat-links: "space.chat.chatlinks"
+  # Allow to show item on chat
   use-item-chat: "space.chat.item-chat"
+  # Allow to use built-in /vanish command
   vanish-command: "space.chat.vanish"
+  # Make the player to be unlisted on tab complete
   unlisted: "space.chat.unlisted"
+  # Separated color permission, to add the following permissions to players:
+  # * space.chat.color.<color> - to only allow certain colors
+  # * space.chat.color.all - to allow all regular colors (red, green... etc.)
+  # * space.chat.color.special - to allow all special colors (obfuscated, strikethrough... etc.)
+  color: "space.chat.color"
+  # Permission to mention other people
+  mention-send: "space.chat.mention.send"
+  # Permission to receive a notification when mentioned
+  mention-receive: "space.chat.mention.receive"

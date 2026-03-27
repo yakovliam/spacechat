@@ -134,6 +134,13 @@ public class Messages {
     public Message ignorePageNotFound, ignorePageEmpty;
     public Message ignoreNotLoaded;
 
+    /*
+       Mention
+     */
+    public Message mentionSend;
+    public Message mentionReceive;
+    public Message mentionIgnoredPlayer;
+
     public Messages(SpaceChatPlugin plugin) {
         this.plugin = plugin;
 
@@ -181,6 +188,10 @@ public class Messages {
         ignorePageNotFound = Message.fromConfigurationSection("ignore.list.page.not-found", this.getLangConfiguration());
         ignorePageEmpty = Message.fromConfigurationSection("ignore.list.page.empty", this.getLangConfiguration());
         ignoreNotLoaded = Message.fromConfigurationSection("ignore.not-loaded", this.getLangConfiguration());
+
+        mentionSend = Message.fromConfigurationSection("mention.send", this.getLangConfiguration());
+        mentionReceive = Message.fromConfigurationSection("mention.receive", this.getLangConfiguration());
+        mentionIgnoredPlayer = Message.fromConfigurationSection("mention.ignored-player", this.getLangConfiguration());
     }
 
     /**

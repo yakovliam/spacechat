@@ -62,6 +62,9 @@ public class SpaceChatConfigKeys {
     public static ConfigKey<String> PERMISSIONS_USE_CHAT_LINKS = key(c -> c.getString("permissions.use-chat-links", "space.chat.chatlinks"));
     public static ConfigKey<String> PERMISSIONS_VANISH_COMMAND = key(c -> c.getString("permissions.vanish-command", "space.chat.vanish"));
     public static ConfigKey<String> PERMISSIONS_UNLISTED = key(c -> c.getString("permissions.unlisted", "space.chat.unlisted"));
+    public static ConfigKey<String> PERMISSIONS_COLOR = key(c -> c.getString("permissions.color", "space.chat.color"));
+    public static ConfigKey<String> PERMISSIONS_MENTION_SEND = key(c -> c.getString("permissions.mention-send", "space.chat.mention.send"));
+    public static ConfigKey<String> PERMISSIONS_MENTION_RECEIVE = key(c -> c.getString("permissions.mention-receive", "space.chat.mention.receive"));
 
     public static ConfigKey<Boolean> BROADCAST_USE_LANG_WRAPPER = key(c -> c.getBoolean("broadcast.use-lang-wrapper", false));
 
@@ -72,13 +75,18 @@ public class SpaceChatConfigKeys {
     public static ConfigKey<Boolean> ITEM_CHAT_WITH_LORE_USE_CUSTOM = key(c -> c.getBoolean("item-chat.with.lore.use-custom", false));
     public static ConfigKey<List<String>> ITEM_CHAT_WITH_LORE_CUSTOM = key(c -> c.getStringList("item-chat.with.lore.custom", List.of()));
     public static ConfigKey<Integer> ITEM_CHAT_MAX_PER_MESSAGE = key(c -> c.getInteger("item-chat.max-per-message", 2));
+    public static ConfigKey<Integer> ITEM_CHAT_MAX_CHARACTERS = key(c -> c.getInteger("item-chat.max-characters", 20));
     public static ConfigKey<DataPath> ITEM_CHAT_ALLOWED_TAGS = key(c -> DataPath.valueOf(c.getStringList("item-chat.allowed-tags", List.of())));
 
     public static ConfigKey<Boolean> USE_RELATIONAL_PLACEHOLDERS = key(c -> c.getBoolean("use-relational-placeholders", false));
 
     public static ConfigKey<List<String>> FAKE_PLAYERS = key(c -> c.getStringList("fake-players", List.of()));
 
-    public static ConfigKey<XSound> PRIVATE_NOTIFICATION_SOUND = key(c -> XSound.matchXSound(c.getString("private.notification.sound", "ENTITY_PLAYER_LEVELUP")).orElse(XSound.ENTITY_PLAYER_LEVELUP));
+    public static ConfigKey<List<String>> CHAT_ESCAPE_COLOR = key(c -> c.getStringList("chat.escape-color", List.of()));
+    public static ConfigKey<Boolean> CHAT_MENTION_ENABLED = key(c -> c.getBoolean("chat.mention.enabled", true));
+    public static ConfigKey<XSound.Record> CHAT_MENTION_SOUND = key(c -> XSound.parse(c.getString("private.notification.sound", "ENTITY_EXPERIENCE_ORB_PICKUP, 3, 1")));
+
+    public static ConfigKey<XSound> PRIVATE_NOTIFICATION_SOUND = key(c -> XSound.of(c.getString("private.notification.sound", "ENTITY_PLAYER_LEVELUP")).orElse(XSound.ENTITY_PLAYER_LEVELUP));
     public static ConfigKey<Long> PRIVATE_COOLDOWN = key(c -> c.getLong("private.cooldown", 2000L));
 
     private static final List<SimpleConfigKey<?>> KEYS = KeyedConfiguration.initialise(SpaceChatConfigKeys.class);

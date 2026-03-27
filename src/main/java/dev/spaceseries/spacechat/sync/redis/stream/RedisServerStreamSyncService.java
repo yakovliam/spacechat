@@ -30,7 +30,6 @@ import dev.spaceseries.spacechat.sync.redis.stream.packet.message.RedisMessageSe
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPubSub;
 
 import java.lang.reflect.Type;
@@ -43,7 +42,7 @@ import static dev.spaceseries.spacechat.config.SpaceChatConfigKeys.*;
 
 @Dependencies(
         value = {
-                @Dependency(value = "redis.clients:jedis:5.2.0", relocate = {"org.json", "{package}.lib.json"}),
+                @Dependency(value = "redis.clients:jedis:7.2.0", relocate = {"org.json", "{package}.lib.json"}),
                 @Dependency("org.slf4j:slf4j-nop:1.7.36")
         },
         relocations = {
@@ -56,7 +55,7 @@ import static dev.spaceseries.spacechat.config.SpaceChatConfigKeys.*;
 public class RedisServerStreamSyncService extends ServerStreamSyncService {
 
     /**
-     * Redis provider
+     * Redis client
      */
     private RedisProvider provider;
 
@@ -191,6 +190,17 @@ public class RedisServerStreamSyncService extends ServerStreamSyncService {
         // send to all players filtering ignored players from sender
         chatManager.sendComponentChatMessage(chatPacket.getSenderName(), chatPacket.getParsedFormat());
 
+        // mention players
+        for (String name : chatPacket.getMentionedPlayers()) {
+            final Player player = Bukkit.getPlayerExact(name);
+            if (player != null) {
+                final List<String> ignored = plugin.getUserManager().getIgnoredList(name);
+                if (!ignored.contains(chatPacket.getSenderName())) {
+                    plugin.getUserManager().mentionReceive(chatPacket.getSenderName(), player);
+                }
+            }
+        }
+
         // send to all players
         //chatManager.sendComponentChatMessage(chatPacket.getComponent());
     }
@@ -228,7 +238,7 @@ public class RedisServerStreamSyncService extends ServerStreamSyncService {
         final Player receiver;
 
         if (!consoleReceiver) {
-            receiver = Bukkit.getPlayer(messagePacket.getReceiverName());
+            receiver = Bukkit.getPlayerExact(messagePacket.getReceiverName());
             // return if the receiver is not online
             if (receiver == null) {
                 return;
@@ -336,13 +346,13 @@ public class RedisServerStreamSyncService extends ServerStreamSyncService {
         // we need to make a new thread in order to not block the main thread....
         new Thread(() -> {
             boolean reconnected = false;
-            while (messengerEnabled && !Thread.interrupted() && provider.provide() != null && !provider.provide().isClosed()) {
-                try (Jedis jedis = provider.provide().getResource()) {
+            while (messengerEnabled && !Thread.interrupted() && !provider.provide().getPool().isClosed()) {
+                try {
                     if (reconnected) {
                         plugin.getLogger().log(Level.INFO, "Redis connection is alive again");
                     }
                     // Lock the thread
-                    jedis.subscribe(messenger,
+                    provider.provide().subscribe(messenger,
                             REDIS_CHAT_CHANNEL.get(this.plugin.getSpaceChatConfig().getAdapter()),
                             REDIS_BROADCAST_CHANNEL.get(this.plugin.getSpaceChatConfig().getAdapter()),
                             REDIS_MESSAGE_CHANNEL.get(this.plugin.getSpaceChatConfig().getAdapter()),
@@ -387,7 +397,7 @@ public class RedisServerStreamSyncService extends ServerStreamSyncService {
     public void end() {
         messengerEnabled = false;
         try {
-            if (this.provider.provide() != null && this.provider.provide().getResource().getClient() != null) {
+            if (!this.provider.provide().getPool().isClosed()) {
                 // unsubscribe from chat channel
                 messenger.unsubscribe(
                         REDIS_CHAT_CHANNEL.get(this.plugin.getSpaceChatConfig().getAdapter()),
@@ -395,10 +405,6 @@ public class RedisServerStreamSyncService extends ServerStreamSyncService {
                         REDIS_MESSAGE_CHANNEL.get(this.plugin.getSpaceChatConfig().getAdapter()),
                         REDIS_ONLINE_PLAYERS_CHANNEL.get(this.plugin.getSpaceChatConfig().getAdapter())
                 );
-
-                if (!provider.provide().isClosed()) {
-                    provider.provide().close();
-                }
             }
         } catch (Throwable ignored) { }
     }
@@ -446,7 +452,7 @@ public class RedisServerStreamSyncService extends ServerStreamSyncService {
             String message = redisPublishDataPacket.getMessage();
             // run async
             Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-                provider.consumer(jedis -> jedis.publish(channel, message)).run();
+                provider.run(client -> client.publish(channel, message));
             });
         }
     }

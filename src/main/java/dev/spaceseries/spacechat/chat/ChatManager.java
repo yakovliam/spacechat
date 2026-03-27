@@ -229,7 +229,17 @@ public class ChatManager implements Manager {
                 );
 
         // send via redis (it won't do anything if redis isn't enabled, so we can be sure that we aren't using dead methods that will throw an exception)
-        serverStreamSyncService.publishChat(new RedisChatPacket(from.getUniqueId(), from.getName(), applicableChannel, SpaceChatConfigKeys.REDIS_SERVER_IDENTIFIER.get(config), SpaceChatConfigKeys.REDIS_SERVER_DISPLAYNAME.get(config), parsed));
+        serverStreamSyncService.publishChat(
+                new RedisChatPacket(
+                        from.getUniqueId(),
+                        from.getName(),
+                        applicableChannel,
+                        SpaceChatConfigKeys.REDIS_SERVER_IDENTIFIER.get(config),
+                        SpaceChatConfigKeys.REDIS_SERVER_DISPLAYNAME.get(config),
+                        parsed,
+                        plugin.getUserManager().mention(from, message)
+                )
+        );
 
         // log to console
         if (event != null) { // if there's an event, log w/ the event

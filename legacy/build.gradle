@@ -2,17 +2,17 @@ dependencies {
     // Compile
     compileOnly 'org.spigotmc:spigot-api:1.12.2-R0.1-SNAPSHOT'
 
-    compileOnly 'com.viaversion:viaversion-common:5.4.1'
+    compileOnly 'com.viaversion:viaversion-common:5.7.0'
 
-    implementation 'net.kyori:adventure-api:4.23.0'
-    implementation('net.kyori:adventure-platform-bukkit:4.4.0') {
+    implementation 'net.kyori:adventure-api:4.26.1'
+    implementation('net.kyori:adventure-platform-bukkit:4.4.1') {
         exclude group: 'net.kyori', module: 'adventure-platform-viaversion'
         exclude group: 'net.kyori', module: 'adventure-platform-facet'
     }
-    implementation 'net.kyori:adventure-text-minimessage:4.23.0'
-    implementation 'net.kyori:adventure-text-serializer-legacy:4.23.0'
-    implementation 'net.kyori:adventure-text-serializer-json-legacy-impl:4.23.0'
-    implementation('net.kyori:adventure-platform-facet:4.4.0') { transitive = false }
+    implementation 'net.kyori:adventure-text-minimessage:4.26.1'
+    implementation 'net.kyori:adventure-text-serializer-legacy:4.26.1'
+    implementation 'net.kyori:adventure-text-serializer-json-legacy-impl:4.26.1'
+    implementation('net.kyori:adventure-platform-facet:4.4.1') { transitive = false }
 }
 
 shadowJar {

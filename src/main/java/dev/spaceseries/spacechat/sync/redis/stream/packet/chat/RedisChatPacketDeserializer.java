@@ -9,6 +9,8 @@ import dev.spaceseries.spacechat.SpaceChatPlugin;
 import dev.spaceseries.spacechat.model.Channel;
 
 import java.lang.reflect.Type;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 public class RedisChatPacketDeserializer implements JsonDeserializer<RedisChatPacket> {
@@ -44,7 +46,17 @@ public class RedisChatPacketDeserializer implements JsonDeserializer<RedisChatPa
         // deserialize
         ParsedFormat parsedFormat = ParsedFormat.fromJson(object.get("component"));
 
+        Set<String> mentionedPlayers;
+        if (object.has("mentioned")) {
+            mentionedPlayers = new HashSet<>();
+            for (JsonElement element : object.get("mentioned").getAsJsonArray()) {
+                mentionedPlayers.add(element.getAsString());
+            }
+        } else {
+            mentionedPlayers = Set.of();
+        }
+
         // return a new message
-        return new RedisChatPacket(sender, senderName, channel, serverIdentifier, serverDisplayName, parsedFormat);
+        return new RedisChatPacket(sender, senderName, channel, serverIdentifier, serverDisplayName, parsedFormat, mentionedPlayers);
     }
 }

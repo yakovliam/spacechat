@@ -2,6 +2,7 @@ package dev.spaceseries.spacechat.listener;
 
 import dev.spaceseries.spacechat.SpaceChatPlugin;
 import dev.spaceseries.spacechat.model.User;
+import dev.spaceseries.spacechat.user.AsyncPermission;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -32,6 +33,7 @@ public class JoinQuitListener implements Listener {
 
             // invalidate
             plugin.getUserManager().invalidate(uuid, name);
+            AsyncPermission.invalidate(event.getPlayer());
         });
     }
 

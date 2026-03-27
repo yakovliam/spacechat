@@ -1,12 +1,18 @@
 package dev.spaceseries.spacechat.util.color;
 
+import dev.spaceseries.spacechat.user.AsyncPermission;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
+import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.function.BiFunction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -16,6 +22,57 @@ public class ColorUtil {
     public static final Pattern HEX_PATTERN = Pattern.compile("&\\(#([A-Fa-f0-9]{6})\\)");
     public static final char COLOR_CHAR = '\u00A7';
     private static final Pattern STRIP_COLOR_PATTERN = Pattern.compile("(?i)" + COLOR_CHAR + "[0-9A-FK-ORX]");
+    private static final Map<Character, String> COLOR_NAME = new HashMap<>();
+
+    static {
+        COLOR_NAME.put('0', "black");
+        COLOR_NAME.put('1', "dark_blue");
+        COLOR_NAME.put('2', "dark_green");
+        COLOR_NAME.put('3', "dark_aqua");
+        COLOR_NAME.put('4', "dark_red");
+        COLOR_NAME.put('5', "dark_purple");
+        COLOR_NAME.put('6', "gold");
+        COLOR_NAME.put('7', "gray");
+        COLOR_NAME.put('8', "dark_gray");
+        COLOR_NAME.put('9', "blue");
+        COLOR_NAME.put('a', "green");
+        COLOR_NAME.put('b', "aqua");
+        COLOR_NAME.put('c', "red");
+        COLOR_NAME.put('d', "light_purple");
+        COLOR_NAME.put('e', "yellow");
+        COLOR_NAME.put('f', "white");
+        COLOR_NAME.put('k', "obfuscated");
+        COLOR_NAME.put('l', "bold");
+        COLOR_NAME.put('m', "strikethrough");
+        COLOR_NAME.put('n', "underlined");
+        COLOR_NAME.put('o', "italic");
+    }
+
+    @NotNull
+    public static String color(@NotNull String message, @NotNull Player player, @NotNull String permission) {
+        return color(message, player, permission, (code, name) -> "" + COLOR_CHAR + code);
+    }
+
+    @NotNull
+    public static String color(@NotNull String message, @NotNull Player player, @NotNull String permission, @NotNull BiFunction<Character, String, String> mapper) {
+        final StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < message.length(); i++) {
+            final char c = message.charAt(i);
+            if (c != '&' || i + 1 >= message.length()) {
+                builder.append(c);
+                continue;
+            }
+            final char code = message.charAt(i + 1);
+            final String name = COLOR_NAME.get(code);
+            if (name != null && ((code < 'k' ? AsyncPermission.check(player, permission + ".all") : AsyncPermission.check(player, permission + ".special")) || AsyncPermission.check(player, permission + "." + name))) {
+                builder.append(mapper.apply(code, name));
+                i++;
+            } else {
+                builder.append(c);
+            }
+        }
+        return builder.toString();
+    }
 
     /**
      * Converts string into baseComponents

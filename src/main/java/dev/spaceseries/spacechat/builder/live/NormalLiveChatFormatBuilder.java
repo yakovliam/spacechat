@@ -1,6 +1,7 @@
 package dev.spaceseries.spacechat.builder.live;
 
 import dev.spaceseries.spacechat.SpaceChatPlugin;
+import dev.spaceseries.spacechat.config.SpaceChatConfigKeys;
 import dev.spaceseries.spacechat.model.formatting.Extra;
 import dev.spaceseries.spacechat.model.formatting.Format;
 import dev.spaceseries.spacechat.model.formatting.ParsedFormat;
@@ -14,12 +15,15 @@ import me.clip.placeholderapi.PlaceholderAPI;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentBuilder;
 import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 public class NormalLiveChatFormatBuilder extends LiveChatFormatBuilder {
 
@@ -83,6 +87,8 @@ public class NormalLiveChatFormatBuilder extends LiveChatFormatBuilder {
                 // parse message
                 Component parsedMessage = new MessageParser(plugin).parse(player, message);
 
+                parsedMessage = escapeColors(parsedMessage);
+
                 // parse miniMessage
                 parsedMiniMessage = MiniMessage.miniMessage().deserialize(mmWithPlaceholdersReplaced.replace("<chat_message>", MiniMessage.miniMessage().serialize(parsedMessage)));
 
@@ -103,7 +109,7 @@ public class NormalLiveChatFormatBuilder extends LiveChatFormatBuilder {
             Component parsedText;
 
             parsedText = LegacyComponentSerializer.legacyAmpersand().deserialize(text)
-                    .replaceText((b) -> b.matchLiteral("<chat_message>").replacement(message));
+                    .replaceText((b) -> b.matchLiteral("<chat_message>").replacement(escapeColors(message)));
 
             // parse message
             parsedText = new MessageParser(plugin).parse(player, parsedText);
@@ -129,6 +135,15 @@ public class NormalLiveChatFormatBuilder extends LiveChatFormatBuilder {
 
             consumer.accept(parsedText, parsedMiniMessage, formatPart.getLineProtocol());
         });
+    }
+    
+    private Component escapeColors(Component message) {
+        for (String regex : SpaceChatConfigKeys.CHAT_ESCAPE_COLOR.get(plugin.getSpaceChatConfig().getAdapter())) {
+            message = message.replaceText(builder -> builder.match(Pattern.compile(regex)).replacement((result ->
+                    result.colorIfAbsent(NamedTextColor.WHITE)
+            )));
+        }
+        return message;
     }
 
     @FunctionalInterface

@@ -86,8 +86,16 @@ public class ItemDataFilter {
     @NotNull
     public static Object filterItemComponents(@NotNull List<Object> container) {
         final List<Object> list = new ArrayList<>();
-        for (Object item : container) {
-            list.add(filterItemComponents(item));
+        for (Object element : container) {
+            final Map<String, Object> item = new HashMap<>();
+            for (Map.Entry<String, Object> entry : TagCompound.getValue(element).entrySet()) {
+                if (entry.getKey().equals("item")) {
+                    item.put(entry.getKey(), filterItemComponents(entry.getValue()));
+                } else {
+                    item.put(entry.getKey(), entry.getValue());
+                }
+            }
+            list.add(TagCompound.newUncheckedTag(item));
         }
         return TagList.newUncheckedTag(list);
     }

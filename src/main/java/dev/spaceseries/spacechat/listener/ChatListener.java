@@ -4,6 +4,7 @@ import dev.spaceseries.spacechat.SpaceChatPlugin;
 import dev.spaceseries.spacechat.config.SpaceChatConfigKeys;
 import dev.spaceseries.spacechat.model.Channel;
 import dev.spaceseries.spacechat.replacer.SectionReplacer;
+import dev.spaceseries.spacechat.util.color.ColorUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
@@ -17,11 +18,11 @@ public class ChatListener implements Listener {
 
     private final LegacyComponentSerializer LEGACY = LegacyComponentSerializer.builder()
             .hexColors()
-            .character(LegacyComponentSerializer.AMPERSAND_CHAR)
+            .character(LegacyComponentSerializer.SECTION_CHAR)
             .build();
     private final LegacyComponentSerializer LEGACY_URL = LegacyComponentSerializer.builder()
             .hexColors()
-            .character(LegacyComponentSerializer.AMPERSAND_CHAR)
+            .character(LegacyComponentSerializer.SECTION_CHAR)
             .extractUrls()
             .build();
     private final LegacyComponentSerializer URL = LegacyComponentSerializer.builder()
@@ -55,10 +56,11 @@ public class ChatListener implements Listener {
         Channel current = plugin.getServerSyncServiceManager().getDataService().getCurrentChannel(player.getUniqueId());
 
         // Avoid usage of MiniMessage or color section from player
-        final String msg = MiniMessage.miniMessage().escapeTags(SECTION_REPLACER.apply(event.getMessage(), player));
+        String msg = MiniMessage.miniMessage().escapeTags(SECTION_REPLACER.apply(event.getMessage(), player));
 
         final Component message;
         if (player.hasPermission(SpaceChatConfigKeys.PERMISSIONS_USE_CHAT_COLORS.get(plugin.getSpaceChatConfig().getAdapter()))) {
+            msg = ColorUtil.color(msg, player, SpaceChatConfigKeys.PERMISSIONS_COLOR.get(plugin.getSpaceChatConfig().getAdapter()));
             // yes, the player has permission to use chat colors, so color message
             if (player.hasPermission(SpaceChatConfigKeys.PERMISSIONS_USE_CHAT_LINKS.get(plugin.getSpaceChatConfig().getAdapter()))) {
                 message = LEGACY_URL.deserialize(msg);

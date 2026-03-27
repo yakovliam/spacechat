@@ -4,6 +4,7 @@ import dev.spaceseries.spacechat.SpaceChatPlugin;
 import dev.spaceseries.spacechat.config.SpaceChatConfigKeys;
 import dev.spaceseries.spacechat.model.Channel;
 import dev.spaceseries.spacechat.replacer.SectionReplacer;
+import dev.spaceseries.spacechat.util.color.ColorUtil;
 import io.papermc.paper.event.player.AsyncChatDecorateEvent;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import net.kyori.adventure.text.Component;
@@ -33,92 +34,33 @@ public class ChatListener implements Listener {
         if (player == null) {
             return;
         }
-        Component result = escapeMiniMessage(event.result());
-        String message = SECTION_REPLACER.apply(MiniMessage.miniMessage().serialize(result), player);
-        if (player.hasPermission(SpaceChatConfigKeys.PERMISSIONS_USE_CHAT_COLORS.get(plugin.getSpaceChatConfig().getAdapter()))) {
-            // yes, the player has permission to use chat colors, so color message
-            if (message.contains("&")) {
-                message = color(message);
+
+        final boolean useChatColor = player.hasPermission(SpaceChatConfigKeys.PERMISSIONS_USE_CHAT_COLORS.get(plugin.getSpaceChatConfig().getAdapter()));
+        final boolean useChatLinks = player.hasPermission(SpaceChatConfigKeys.PERMISSIONS_USE_CHAT_LINKS.get(plugin.getSpaceChatConfig().getAdapter()));
+        if (useChatColor || useChatLinks) {
+            Component result = escapeMiniMessage(event.result());
+            String message = SECTION_REPLACER.apply(MiniMessage.miniMessage().serialize(result), player);
+            boolean modified = false;
+
+            if (useChatColor && message.contains("&")) {
+                modified = true;
+                message = ColorUtil.color(message, player, SpaceChatConfigKeys.PERMISSIONS_COLOR.get(plugin.getSpaceChatConfig().getAdapter()), (code, name) -> "<" + name + ">");
             }
-        }
-        if (player.hasPermission(SpaceChatConfigKeys.PERMISSIONS_USE_CHAT_LINKS.get(plugin.getSpaceChatConfig().getAdapter()))) {
-            if (message.contains("http")) {
+
+            if (useChatLinks && message.contains("http")) {
+                modified = true;
                 message = urls(message);
             }
-        }
 
-        event.result(MiniMessage.miniMessage().deserialize(message));
+            if (modified) {
+                event.result(MiniMessage.miniMessage().deserialize(message));
+            }
+        }
     }
 
     private static Component escapeMiniMessage(Component component) {
         final String json = GsonComponentSerializer.gson().serialize(component);
         return GsonComponentSerializer.gson().deserialize(MiniMessage.miniMessage().escapeTags(json));
-    }
-
-    private static String color(String s) {
-        final StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < s.length(); i++) {
-            final char c = s.charAt(i);
-            if (c != '&' || i + 1 >= s.length()) {
-                builder.append(c);
-                continue;
-            }
-            switch (s.charAt(i + 1)) {
-                case '0':
-                    builder.append("<black>");
-                    break;
-                case '1':
-                    builder.append("<dark_blue>");
-                    break;
-                case '2':
-                    builder.append("<dark_green>");
-                    break;
-                case '3':
-                    builder.append("<dark_aqua>");
-                    break;
-                case '4':
-                    builder.append("<dark_red>");
-                    break;
-                case '5':
-                    builder.append("<dark_purple>");
-                    break;
-                case '6':
-                    builder.append("<gold>");
-                    break;
-                case '7':
-                    builder.append("<gray>");
-                    break;
-                case '8':
-                    builder.append("<dark_gray>");
-                    break;
-                case '9':
-                    builder.append("<blue>");
-                    break;
-                case 'a':
-                    builder.append("<green>");
-                    break;
-                case 'b':
-                    builder.append("<aqua>");
-                    break;
-                case 'c':
-                    builder.append("<red>");
-                    break;
-                case 'd':
-                    builder.append("<light_purple>");
-                    break;
-                case 'e':
-                    builder.append("<yellow>");
-                    break;
-                case 'f':
-                    builder.append("<white>");
-                    break;
-                default:
-                    builder.append(c);
-                    continue;
-            }
-            i++;
-        }
-        return builder.toString();
     }
 
     private static String urls(String message) {

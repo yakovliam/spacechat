@@ -19,7 +19,7 @@ import java.util.List;
 @Dependencies(value = {
         // Non-paper servers
         @Dependency(
-                value = "net.kyori:adventure-api:4.23.0",
+                value = "net.kyori:adventure-api:4.26.1",
                 repository = @Repository(url = "MavenCentral"),
                 condition = {"paper=false", "adventure=true"},
                 relocate = {
@@ -29,7 +29,7 @@ import java.util.List;
                 }
         ),
         @Dependency(
-                value = "net.kyori:adventure-platform-bukkit:4.4.0",
+                value = "net.kyori:adventure-platform-bukkit:4.4.1",
                 repository = @Repository(url = "MavenCentral"),
                 condition = {"paper=false", "adventure=true"},
                 relocate = {
@@ -39,7 +39,7 @@ import java.util.List;
                 }
         ),
         @Dependency(
-                value = "net.kyori:adventure-text-minimessage:4.23.0",
+                value = "net.kyori:adventure-text-minimessage:4.26.1",
                 repository = @Repository(url = "MavenCentral"),
                 condition = {"paper=false", "adventure=true"},
                 relocate = {
